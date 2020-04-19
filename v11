@@ -1,18 +1,25 @@
 
-import PyPDF2
-import re 
+
+import sys         # to pass ISDA.pdfs to be analyzed from the command line 
+import PyPDF2      # to process PDFs into readable text 
+import re          # to search values in the extracted text 
+import csv         # to extract and store values extracted from PDF 
+import smtplib, ssl# to send out results 
 
 
-#Write a for-loop to open many files (leave a comment if you'd like to learn how).
-filename = 'SampleISDA.pdf' 
+#########################################################################################
+############### PDF Extraction module ###################################################
 
-#open allows you to read the file.
+#Open a given ISDA(Master and Schedule(NOT w/ CSA)).pdf
+filename = sys.argv[1] 
+
+#read the file.
 pdfFileObj = open(filename,'rb')
 
 #The pdfReader variable is a readable object that will be parsed.
 pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
 
-#Discerning the number of pages will allow us to parse through all the pages.
+#Discerning the number of pages to parse through ALL the pages.
 num_pages = pdfReader.numPages
 count = 0
 text = ""
@@ -23,7 +30,7 @@ while count < num_pages:
     count +=1
     text += pageObj.extractText()
 
-#This if statement exists to check if the above library returned words. It's done because PyPDF2 cannot read scanned files.
+#Check if the above library returned words. It's done because PyPDF2 cannot read scanned files.
 if text != "":
    text = text
 
@@ -34,19 +41,204 @@ else:
 #Now we have a text variable that contains all the text derived from our PDF file. Type print(text) to see what it contains. It likely contains a lot of spaces, possibly junk such as '\n,' etc.
 
 
+##########################################################################
+##################  RegEx Module 
+
 if re.search("Specified Entity | Party A| Not Applicable", text):
+    re.search1 = 'Not applicable'
     print("Schedule (a): Specified Entity not applicable to Party A")
 else:
     print("Specified Entity is applicable to Party A")
+
     
+if re.search("Governing Law | New York", text):
+    re.search3 = 'New York'
+    print("Schedule (h): Governing Law is New York")
+else:
+    print("Governing law is English")
+
+
+if re.search("Specified Transaction | Section 14", text):
+    re.search4 = 'New York'
+    print("Schedule (b): Section 14")
+else:
+    print("CHECK THIS!")
+    
+    
+if re.search("Events of Default| Party A and Party B", text):
+    re.search5 = 'Party A and Party B'
+    print("Schedule (c): Apply to Party A and Party B")
+else:
+    print("CHECK THIS!")
+    
+    
+if re.search("Termination Events | Party A and Pary B", text):
+    re.search6 = 'Section 5 Party A and Party B'
+    print("Schedule (d): Section5(b) to Party A and PArty B")
+else:
+    print("Governing law is English")
+    
+    
+if re.search("Automatic Early Termination| Market | Second", text):
+    re.search7 = 'Market Quotation and Second Method'
+    print("Schedule (f): Market Quotation and Second Method")
+else:
+    print("Market Only or Second Method Only")
+
     
 if re.search("Termination Currency| United States Dollar", text):
+    re.search2 = 'USD'
     print("Schedule (g): Termination Currency is USD")
 else:
     print("Termination Currency is British Pound")
     
+    
+if re.search("Additional Termination Events | Party A", text):
+    re.search9 = 'Party A fails'
+    print("Schedule (h): Party A fails")
+else:
+    print("No ATEs")
+    
 
-if re.search("Governing Law |United States", text):
+if re.search("Payer Representations|", text):
+    re.search10 = 'Payer Representations'
+    print("Schedule Part2(a): Payer Representations")
+else:
+    print("No Payer Representations")
+    
+    
+if re.search("Payee Representations |", text):
+    re.search11 = 'Payee Representations'
+    print("Schedule Part2(b): Payee Representations")
+else:
+    print("No Payee Representations")
+
+
+if re.search("Addresess for Notices | Party A", text):
+    re.search12 = 'Schedule Part4:(a) Addresess for Notices'
+    print("Schedule Part4(a): Addresess for Notices; Party A:") 
+else:
+    print("Party A: No Notice Addresess")
+
+
+if re.search("Addresess for Notices | Party B", text):
+    re.search13 = 'Addresess for Notices; Party B:'
+    print("Schedule (b): Addresess for Notices; Party B:")
+else:
+    print("Party B: No Notice Addresess")
+
+
+if re.search("Process Agent |", text):
+    re.search14 = 'Process Agent:'
+    print("Schedule Part4(b): Process Agent: ")
+else:
+    print("No Process Agent Appointed")
+
+
+if re.search("Offices | ", text):
+    re.search15 = 'Offices:'
+    print("Schedule Part4:(c): Offices:")
+else:
+    print("No Offices Provision")
+
+
+if re.search("Multibranch Party | Party A| Party B", text):
+    re.search16 = "Multibranch"
+    print("Schedule (h) Party A is Multibranch and Party B")
+else:
+    print("Either one or both parties is not Multibranch")
+
+
+if re.search("Calculation Agent | Party A", text):
+    re.search17 = 'Party A'
+    print("Schedule Part4(d): The Calculation Agent is Party A")
+else:
+    print("The Calculation Agent is Party B")
+
+
+if re.search("Credit Support Document | Annex", text):
+    re.search18 = 'Credit Support Annex'
+    print("Schedule Part4(f): Credit Support Annex")
+else:
+    print("PSA")
+
+
+if re.search("Credit Support Provider | Not applicable", text):
+    re.search19 = 'Not applicable'
+    print("Schedule Part4(g): Credit Support not applicable")
+else:
+    print("CSP is applicable")
+
+
+if re.search("Governing Law | New York", text):
+    re.search20 = 'New York'
     print("Schedule (h): Governing Law is New York")
 else:
     print("Governing law is English")
+
+
+if re.search("Netting of Payments| apply to all", text):
+    re.search21 = 'Apply to all '
+    print("Schedule Part4(i): Netting of Payments apply to all transactions")
+else:
+    print("Netting of Payments does not apply to all transactions")
+
+
+if re.search("Afffiliate | have no", text):
+    re.search22 = 'None'
+    print("Schedule Part4(j): Parties deemed to have no Afffiliates")
+else:
+    print("Parties deemed to have Afffiliates")
+
+
+##################################################################################
+#############  CSV Module ##########################################################
+
+######### Extracting search result variable values (re.search#) from RegEx part and put them into CSV file under columns ISDA_terms
+ISDA_terms = ['Specififed Entity Party A', 'Specified Entity Party B', 'Specified Transaction', 'Certain Events of Credit Default', 'Automatic Early Termination', 'Payments on Early Termination', 'Termination Currency', 'Additional Termination Events', 'Payer Representations', 'Payee Representations', 'Addresess for Notices CPTY', 'Process Agent', 'Offices', 'Multibranch Party', 'Calculation Agent', 'Credit Support Document', 'Credit Support Provider', 'Governing Law', 'Netting of Payments', 'Afffiliate', 'Definitions', 'Downgrade Provisions', 'Termination Currency']
+values = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search22,]
+
+############ Creating CSV writer object, create CSV rows and columns
+
+with open('ISDAOutputFile.csv', 'w') as csv_file:
+    csv_writer = csv.writer(csv_file, delimiter=',')
+    csv_writer.writerow(ISDA_terms)
+    csv_writer.writerow(values)
+
+
+
+#####################################################
+
+import yagmail
+
+receiver = "koroloff@gmail.com"
+body = "Please accept this .CSV file for upoload into DocForce via the wizard"
+filename = "ISDAOutputFile.csv"
+
+yag = yagmail.SMTP("koroloff@gmail.com")
+yag.send(
+    to=receiver,
+    subject="ISDA Credit Terms in a .CSV file",
+    contents=body, 
+    attachments=filename,)
+
+
+################################################################################################
+###################### HTTP Module ##############################################################
+
+#Send the file with CSV file to the requestor 
+
+import http.server 
+
+class Handler(http.server.BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header('Content-Type', csv)
+        self.end_headers()
+        self.wfile.write('ISDAOutputFile.csv'.encode())
+        
+if __name__ == '__main__':
+    server = ('', 0)
+    httpd = http.server.HTTPServer(server, Handler)
+    print('If you have no access to your email account - you can still access extracted ISDA terms at http://localhost:{}'.format(httpd.server_address))
+    httpd.serve_forever()
