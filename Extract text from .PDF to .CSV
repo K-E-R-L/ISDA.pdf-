@@ -1,5 +1,4 @@
 
-
 import sys         # to pass ISDA.pdfs to be analyzed from the command line 
 import PyPDF2      # to process PDFs into readable text 
 import re          # to search values in the extracted text 
@@ -14,10 +13,10 @@ import smtplib, ssl# to send out results
 filename = sys.argv[1] 
 
 #read the file.
-pdfFileObj = open(filename,'rb')
+pdfFile = open(filename,'rb')
 
-#The pdfReader variable is a readable object that will be parsed.
-pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+#The pdfReader variable that is readable and will be analyzed.
+pdfReader = PyPDF2.PdfFileReader(pdfFile)
 
 #Discerning the number of pages to parse through ALL the pages.
 num_pages = pdfReader.numPages
