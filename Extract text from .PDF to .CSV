@@ -1,26 +1,43 @@
-
 import sys         # to pass ISDA.pdfs to be analyzed from the command line 
 import PyPDF2      # to process PDFs into readable text 
 import re          # to search values in the extracted text 
 import csv         # to extract and store values extracted from PDF 
-import smtplib, ssl# to send out results 
+import yagmail     # to email out results automatically
+import http.server # to send out results on demand 
+import os          # operate computer 
+import glob        #pull files off computer
 
+######################################################
+#############Locate files on the computer to be converted
+file_location = os.path.join('outfiles', '*pdf')
+
+filenames = glob.glob(file_location)
+
+print(filenames)
+
+#filenames = ['SampleISDA.pdf', 'ISDASample2.pdf', 'ISDASample3.pdf', 'SampleISDA.pdf'] 
 
 #########################################################################################
 ############### PDF Extraction module ###################################################
 
-#Open a given ISDA(Master and Schedule(NOT w/ CSA)).pdf
-filename = sys.argv[1] 
+#Open a given ISDA(Master and Schedule .PDF, pass the name of the .PDF in the command line 
+ 
+for filenames in filenames:
+    open(filenames)
 
 #read the file.
-pdfFile = open(filename,'rb')
+pdfFile = open(filenames,'rb')
 
 #The pdfReader variable that is readable and will be analyzed.
-pdfReader = PyPDF2.PdfFileReader(pdfFile)
+count = 0
+while count < 10:
+    print ("NEXT PDF")
+    count = count + 1
+    pdfReader = PyPDF2.PdfFileReader(pdfFile)
 
 #Discerning the number of pages to parse through ALL the pages.
 num_pages = pdfReader.numPages
-count = 0
+count = 0 
 text = ""
 
 #The while loop will read each page.
@@ -39,179 +56,204 @@ else:
 
 #Now we have a text variable that contains all the text derived from our PDF file. Type print(text) to see what it contains. It likely contains a lot of spaces, possibly junk such as '\n,' etc.
 
+pdfFile.close()
 
-##########################################################################
-##################  RegEx Module 
+#############################################################################################################################
+####################################################################  RegEx Module #########################################
 
-if re.search("Specified Entity | Party A| Not Applicable", text):
-    re.search1 = 'Not applicable'
-    print("Schedule (a): Specified Entity not applicable to Party A")
-else:
-    print("Specified Entity is applicable to Party A")
+
+count = 0
+while count < 10:
+    print ("NEXT FILE")
+    count = count + 1
+    
+    if re.search("Specified Entity | Party A| Not Applicable", text):
+        search1 = 'Not applicable'
+        print("Schedule (a): Specified Entity not applicable to Party A")
+    else:
+        print("Specified Entity is applicable to Party A")
 
     
-if re.search("Governing Law | New York", text):
-    re.search3 = 'New York'
-    print("Schedule (h): Governing Law is New York")
-else:
-    print("Governing law is English")
+    if re.search("Governing Law | New York", text):
+        re.search2 = 'New York'
+        print("Schedule (h): Governing Law is New York")
+    else:
+        print("Governing law is English")
 
 
-if re.search("Specified Transaction | Section 14", text):
-    re.search4 = 'New York'
-    print("Schedule (b): Section 14")
-else:
-    print("CHECK THIS!")
+    if re.search("Specified Transaction | Section 14", text):
+        re.search3 = 'New York'
+        print("Schedule (b): Section 14")
+    else:
+        print("CHECK THIS!")
     
     
-if re.search("Events of Default| Party A and Party B", text):
-    re.search5 = 'Party A and Party B'
-    print("Schedule (c): Apply to Party A and Party B")
-else:
-    print("CHECK THIS!")
+    if re.search("Events of Default| Party A and Party B", text):
+        re.search4 = 'Party A and Party B'
+        print("Schedule (c): Apply to Party A and Party B")
+    else:
+        print("CHECK THIS!")
     
     
-if re.search("Termination Events | Party A and Pary B", text):
-    re.search6 = 'Section 5 Party A and Party B'
-    print("Schedule (d): Section5(b) to Party A and PArty B")
-else:
-    print("Governing law is English")
+    if re.search("Termination Events | Party A and Pary B", text):
+        re.search5 = 'Section 5 Party A and Party B'
+        print("Schedule (d): Section5(b) to Party A and PArty B")
+    else:
+        print("Governing law is English")
     
     
-if re.search("Automatic Early Termination| Market | Second", text):
-    re.search7 = 'Market Quotation and Second Method'
-    print("Schedule (f): Market Quotation and Second Method")
-else:
-    print("Market Only or Second Method Only")
+    if re.search("Automatic Early Termination| Market | Second", text):
+        re.search6 = 'Market Quotation and Second Method'
+        print("Schedule (f): Market Quotation and Second Method")
+    else:
+        print("Market Only or Second Method Only")
 
     
-if re.search("Termination Currency| United States Dollar", text):
-    re.search2 = 'USD'
-    print("Schedule (g): Termination Currency is USD")
-else:
-    print("Termination Currency is British Pound")
+    if re.search("Termination Currency| United States Dollar", text):
+        re.search7 = 'USD'
+        print("Schedule (g): Termination Currency is USD")
+    else:
+        print("Termination Currency is British Pound")
     
     
-if re.search("Additional Termination Events | Party A", text):
-    re.search9 = 'Party A fails'
-    print("Schedule (h): Party A fails")
-else:
-    print("No ATEs")
+    if re.search("Additional Termination Events | Party A", text):
+        re.search8 = 'Party A fails'
+        print("Schedule (h): Party A fails")
+    else:
+        print("No ATEs")
     
 
-if re.search("Payer Representations|", text):
-    re.search10 = 'Payer Representations'
-    print("Schedule Part2(a): Payer Representations")
-else:
-    print("No Payer Representations")
+    if re.search("Payer Representations|", text):
+        re.search9 = 'Payer Representations'
+        print("Schedule Part2(a): Payer Representations")
+    else:
+        print("No Payer Representations")
     
     
-if re.search("Payee Representations |", text):
-    re.search11 = 'Payee Representations'
-    print("Schedule Part2(b): Payee Representations")
-else:
-    print("No Payee Representations")
+    if re.search("Payee Representations |", text):
+        re.search10 = 'Payee Representations'
+        print("Schedule Part2(b): Payee Representations")
+    else:
+        print("No Payee Representations")
 
 
-if re.search("Addresess for Notices | Party A", text):
-    re.search12 = 'Schedule Part4:(a) Addresess for Notices'
-    print("Schedule Part4(a): Addresess for Notices; Party A:") 
-else:
-    print("Party A: No Notice Addresess")
+    if re.search("Addresess for Notices | Party A", text):
+        re.search11 = 'Schedule Part4:(a) Addresess for Notices'
+        print("Schedule Part4(a): Addresess for Notices; Party A:") 
+    else:
+        print("Party A: No Notice Addresess")
 
 
-if re.search("Addresess for Notices | Party B", text):
-    re.search13 = 'Addresess for Notices; Party B:'
-    print("Schedule (b): Addresess for Notices; Party B:")
-else:
-    print("Party B: No Notice Addresess")
+    if re.search("Addresess for Notices | Party B", text):
+        re.search12 = 'Addresess for Notices; Party B:'
+        print("Schedule (b): Addresess for Notices; Party B:")
+    else:
+        print("Party B: No Notice Addresess")
 
 
-if re.search("Process Agent |", text):
-    re.search14 = 'Process Agent:'
-    print("Schedule Part4(b): Process Agent: ")
-else:
-    print("No Process Agent Appointed")
+    if re.search("Process Agent |", text):
+        re.search13 = 'Process Agent:'
+        print("Schedule Part4(b): Process Agent: ")
+    else:
+        print("No Process Agent Appointed")
 
 
-if re.search("Offices | ", text):
-    re.search15 = 'Offices:'
-    print("Schedule Part4:(c): Offices:")
-else:
-    print("No Offices Provision")
+    if re.search("Offices | ", text):
+        re.search14 = 'Offices:'
+        print("Schedule Part4:(c): Offices:")
+    else:
+        print("No Offices Provision")
 
 
-if re.search("Multibranch Party | Party A| Party B", text):
-    re.search16 = "Multibranch"
-    print("Schedule (h) Party A is Multibranch and Party B")
-else:
-    print("Either one or both parties is not Multibranch")
+    if re.search("Multibranch Party | Party A| Party B", text):
+        re.search15 = "Multibranch"
+        print("Schedule (h) Party A is Multibranch and Party B")
+    else:
+        print("Either one or both parties is not Multibranch")
 
 
-if re.search("Calculation Agent | Party A", text):
-    re.search17 = 'Party A'
-    print("Schedule Part4(d): The Calculation Agent is Party A")
-else:
-    print("The Calculation Agent is Party B")
+    if re.search("Calculation Agent | Party A", text):
+        re.search16 = 'Party A'
+        print("Schedule Part4(d): The Calculation Agent is Party A")
+    else:
+        print("The Calculation Agent is Party B")
 
 
-if re.search("Credit Support Document | Annex", text):
-    re.search18 = 'Credit Support Annex'
-    print("Schedule Part4(f): Credit Support Annex")
-else:
-    print("PSA")
+    if re.search("Credit Support Document | Annex", text):
+        re.search17 = 'Credit Support Annex'
+        print("Schedule Part4(f): Credit Support Annex")
+    else:
+        print("PSA")
 
 
-if re.search("Credit Support Provider | Not applicable", text):
-    re.search19 = 'Not applicable'
-    print("Schedule Part4(g): Credit Support not applicable")
-else:
-    print("CSP is applicable")
+    if re.search("Credit Support Provider | Not applicable", text):
+        re.search18 = 'Not applicable'
+        print("Schedule Part4(g): Credit Support not applicable")
+    else:
+        print("CSP is applicable")
 
 
-if re.search("Governing Law | New York", text):
-    re.search20 = 'New York'
-    print("Schedule (h): Governing Law is New York")
-else:
-    print("Governing law is English")
+    if re.search("Governing Law | New York", text):
+        re.search19 = 'New York'
+        print("Schedule (h): Governing Law is New York")
+    else:
+        print("Governing law is English")
 
 
-if re.search("Netting of Payments| apply to all", text):
-    re.search21 = 'Apply to all '
-    print("Schedule Part4(i): Netting of Payments apply to all transactions")
-else:
-    print("Netting of Payments does not apply to all transactions")
+    if re.search("Netting of Payments| apply to all", text):
+        re.search20 = 'Apply to all '
+        print("Schedule Part4(i): Netting of Payments apply to all transactions")
+    else:
+        print("Netting of Payments does not apply to all transactions")
 
 
-if re.search("Afffiliate | have no", text):
-    re.search22 = 'None'
-    print("Schedule Part4(j): Parties deemed to have no Afffiliates")
-else:
-    print("Parties deemed to have Afffiliates")
+    if re.search("Afffiliate | have no", text):
+        re.search21 = 'None'
+        print("Schedule Part4(j): Parties deemed to have no Afffiliates")
+    else:
+        print("Parties deemed to have Afffiliates")
 
 
-##################################################################################
-#############  CSV Module ##########################################################
+
+#####################################################################################################################################################
+#############  CSV Module ##########################################################################################################################
+###################################################################################################################################################
 
 ######### Extracting search result variable values (re.search#) from RegEx part and put them into CSV file under columns ISDA_terms
-ISDA_terms = ['Specififed Entity Party A', 'Specified Entity Party B', 'Specified Transaction', 'Certain Events of Credit Default', 'Automatic Early Termination', 'Payments on Early Termination', 'Termination Currency', 'Additional Termination Events', 'Payer Representations', 'Payee Representations', 'Addresess for Notices CPTY', 'Process Agent', 'Offices', 'Multibranch Party', 'Calculation Agent', 'Credit Support Document', 'Credit Support Provider', 'Governing Law', 'Netting of Payments', 'Afffiliate', 'Definitions', 'Downgrade Provisions', 'Termination Currency']
-values = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search22,]
+ISDA_terms = ['Specififed Entity Party A', 'Specified Entity Party B', 'Specified Transaction', 'Certain Events of Credit Default', 'Automatic Early Termination', 'Payments on Early Termination', 'Termination Currency', 'Additional Termination Events', 'Payer Representations', 'Payee Representations', 'Addresess for Notices CPTY', 'Process Agent', 'Offices', 'Multibranch Party', 'Calculation Agent', 'Credit Support Document', 'Credit Support Provider', 'Governing Law', 'Netting of Payments', 'Afffiliate', 'Definitions', 'Downgrade Provisions',]
+values_1 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search8,  re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,]
+values_2 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_3 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_4 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_5 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_6 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_7 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_8 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_9 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
+values_10 = [re.search1,  re.search2,  re.search3,  re.search4,  re.search5,  re.search6,  re.search7, re.search9,  re.search10,  re.search11,  re.search12,  re.search13,  re.search14,  re.search15,  re.search16,  re.search17,  re.search18,  re.search19,  re.search20,  re.search21,  re.search21,]
 
 ############ Creating CSV writer object, create CSV rows and columns
 
 with open('ISDAOutputFile.csv', 'w') as csv_file:
     csv_writer = csv.writer(csv_file, delimiter=',')
     csv_writer.writerow(ISDA_terms)
-    csv_writer.writerow(values)
+    csv_writer.writerow(values_1)
+    csv_writer.writerow(values_2)
+    csv_writer.writerow(values_3)
+    csv_writer.writerow(values_4)
+    csv_writer.writerow(values_5)
+    csv_writer.writerow(values_6)
+    csv_writer.writerow(values_7)
+    csv_writer.writerow(values_8)
+    csv_writer.writerow(values_9)
+    csv_writer.writerow(values_10)
 
-
-
-#####################################################
-
-import yagmail
+csv_file.close()
+#################################################################### 
+######################## Yagmail Module ############################
 
 receiver = "koroloff@gmail.com"
-body = "Please accept this .CSV file for upoload into DocForce via the wizard"
+body = "Please accept this .CSV file for upload into DocForce via the SalesForce wizard"
 filename = "ISDAOutputFile.csv"
 
 yag = yagmail.SMTP("koroloff@gmail.com")
@@ -227,7 +269,6 @@ yag.send(
 
 #Send the file with CSV file to the requestor 
 
-import http.server 
 
 class Handler(http.server.BaseHTTPRequestHandler):
     def do_GET(self):
@@ -241,3 +282,5 @@ if __name__ == '__main__':
     httpd = http.server.HTTPServer(server, Handler)
     print('If you have no access to your email account - you can still access extracted ISDA terms at http://localhost:{}'.format(httpd.server_address))
     httpd.serve_forever()
+
+    
